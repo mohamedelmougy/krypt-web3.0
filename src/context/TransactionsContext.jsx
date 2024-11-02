@@ -20,8 +20,11 @@ const getEthereumContract = () => {
 
 export const TransactionProvider = ({ children }) => {
   const [currentAccount, setCurrentAccount] = useState("");
-  const [isLoading, setIsLoading] = useState(false)
-  const [transactionCount, setTransactionCount] = useState(localStorage.getItem("transactionCount"))
+  const [isLoading, setIsLoading] = useState(false);
+  const [transactionCount, setTransactionCount] = useState(
+    localStorage.getItem("transactionCount")
+  );
+  const [transactions, setTransactions] = useState([]);
   const [formData, setFormData] = useState({
     addressTo: "",
     amount: "",
@@ -32,6 +35,31 @@ export const TransactionProvider = ({ children }) => {
   const handleChange = (e, name) => {
     setFormData((prevState) => ({ ...prevState, [name]: e.target.value }));
   };
+  const getAllTransactions = async () => {
+    try {
+      if (!ethereum) return alert("please install metamask");
+      const transactionsContract = getEthereumContract();
+      const availableTransactions =
+        await transactionsContract.getAllTransactions();
+
+      const structuredTransactions = availableTransactions.map(
+        (transaction) => ({
+          addressTo: transaction.receiver,
+          addressFrom: transaction.sender,
+          timestamp: new Date(
+            transaction.timestamp.toNumber() * 1000
+          ).toLocaleString(),
+          message: transaction.message,
+          keyword: transaction.keyword,
+          amount: parseInt(transaction.amount._hex) / 10 ** 18,
+        })
+      );
+      console.log(structuredTransactions);
+      setTransactions(structuredTransactions);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -40,11 +68,22 @@ export const TransactionProvider = ({ children }) => {
       if (accounts.length) {
         setCurrentAccount(accounts[0]);
 
-        // get all transactions
+        getAllTransactions();
       } else {
         console.log("no account found");
       }
       console.log("🚀 ~ checkIfWalletIsConnected ~ accounts:", accounts);
+    } catch (error) {
+      console.log(error);
+      throw new Error("no ethereum object.");
+    }
+  };
+
+  const checkIfTransactionsExist = async () => {
+    try {
+      const transactionsContract = getEthereumContract();
+      const transactionCount = await transactionsContract.getTransactionCount();
+      window.localStorage.setItem("transactionCount", transactionCount);
     } catch (error) {
       console.log(error);
       throw new Error("no ethereum object.");
@@ -82,23 +121,26 @@ export const TransactionProvider = ({ children }) => {
             value: parsedAmount._hex, // 0.00001
           },
         ],
-
       });
 
+      const transactionHash = await transactionsContract.addToBlockchain(
+        addressTo,
+        parsedAmount,
+        message,
+        keyword
+      );
 
+      setIsLoading(true);
+      console.log(`Loading - ${transactionHash.hash}`);
 
-     const transactionHash=await  transactionsContract.addToBlockchain(addressTo,parsedAmount,message,keyword)
+      await transactionHash.wait();
 
-     setIsLoading(true)
-     console.log(`Loading - ${transactionHash.hash}`)
+      setIsLoading(false);
+      console.log(`Success - ${transactionHash.hash}`);
 
-     await transactionHash.wait()
-
-     setIsLoading(false)
-     console.log(`Success - ${transactionHash.hash}`)
-
-     const transactionCount =await transactionsContract.getTransactionCount()
-     setTransactionCount(transactionCount.toNumber())
+      const transactionCount = await transactionsContract.getTransactionCount();
+      setTransactionCount(transactionCount.toNumber());
+      window.reload()
     } catch (error) {
       console.log(error);
       throw new Error("no ethereum object.");
@@ -107,6 +149,7 @@ export const TransactionProvider = ({ children }) => {
 
   useEffect(() => {
     checkIfWalletIsConnected();
+    checkIfTransactionsExist();
   }, []);
 
   return (
@@ -117,6 +160,8 @@ export const TransactionProvider = ({ children }) => {
         formData,
         handleChange,
         sendTransaction,
+        transactions,
+        isLoading,
       }}
     >
       {children}

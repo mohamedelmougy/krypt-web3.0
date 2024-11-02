@@ -21,8 +21,8 @@ const Input = ({ placeholder, name, type, value, handleChange }) => (
 );
 
 const Welcome = () => {
-  const { connectWallet, currentAccount, formData, handleChange,sendTransaction } =
-    useContext(transactionContext);
+  const { connectWallet, currentAccount, formData, handleChange,sendTransaction,isLoading } =
+  useContext(transactionContext);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -106,7 +106,7 @@ const Welcome = () => {
             handleChange={handleChange}
           />
           <div className="h-[1px] w-full bg-gray-400 my-2" />
-          {false ? (
+          {isLoading ? (
             <Loader />
           ) : (
             <button
