@@ -54,7 +54,6 @@ export const TransactionProvider = ({ children }) => {
           amount: parseInt(transaction.amount._hex) / 10 ** 18,
         })
       );
-      console.log(structuredTransactions);
       setTransactions(structuredTransactions);
     } catch (error) {
       console.log(error);
@@ -72,7 +71,6 @@ export const TransactionProvider = ({ children }) => {
       } else {
         console.log("no account found");
       }
-      console.log("🚀 ~ checkIfWalletIsConnected ~ accounts:", accounts);
     } catch (error) {
       console.log(error);
       throw new Error("no ethereum object.");
@@ -131,12 +129,10 @@ export const TransactionProvider = ({ children }) => {
       );
 
       setIsLoading(true);
-      console.log(`Loading - ${transactionHash.hash}`);
 
       await transactionHash.wait();
 
       setIsLoading(false);
-      console.log(`Success - ${transactionHash.hash}`);
 
       const transactionCount = await transactionsContract.getTransactionCount();
       setTransactionCount(transactionCount.toNumber());
