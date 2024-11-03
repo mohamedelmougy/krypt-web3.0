@@ -1,8 +1,24 @@
-# React + Vite
+# Krypt web 3.0
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
+Web 3.0 represents the next evolution of the internet, characterized by decentralized applications (dApps) that empower users to interact directly with the blockchain, cutting out intermediaries and providing secure, transparent transactions. Built on blockchain technology, Web 3.0 leverages smart contracts, which are self-executing contracts with terms directly written into code. Using Solidity, developers can create these smart contracts on the Ethereum blockchain, enabling programmable, trustless agreements that operate autonomously.
 
-Currently, two official plugins are available:
+![](images/krypt1.jpeg)
+![](images/krypt2.jpeg)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 1. Tech Stack
+
+- Framework: `React.js`
+- Styling: `Tailwind CSS`
+- Smart Contract: `Solidity, Metamask, ethers.js`
+
+
+## Getting Started
+
+To get a local copy of the project up and running, follow these steps:
+
+```bash
+git clone https://github.com/mohamedelmougy/krypt-web3.0.git
+npm i
+npm run dev
+```
